@@ -1,0 +1,13 @@
+- (void)addAnchorWithTransform:(matrix_float4x4)transform {
+  self.arAnchor = [[ARAnchor alloc] initWithTransform:transform];
+  [self.sceneView.session addAnchor:self.arAnchor];
+
+  __weak ExampleViewController *weakSelf = self;
+  self.hostFuture = [self.cloudAnchorManager
+      hostCloudAnchor:self.arAnchor
+           completion:^(NSString *anchorId, GARCloudAnchorState cloudState) {
+             [weakSelf handleHostAnchor:anchorId cloudState:cloudState];
+           }
+                error:nil];
+  [self enterState:HelloARStateHosting];
+}
