@@ -11,3 +11,21 @@
                 error:nil];
   [self enterState:HelloARStateHosting];
 }
+- (void)resolveAnchorWithIdentifier:(NSString *)identifier {
+  GARResolveCloudAnchorFuture *garFuture =
+      [self.gSession resolveCloudAnchorWithIdentifier:identifier
+                                    completionHandler:completion
+                                                error:&error];
+}
+
+// Pass the ARFRame to the ARCore session every time there is a frame update.
+// This returns a GARFrame that contains a list of updated anchors. If your
+// anchor's pose or tracking state changed, your anchor will be in the list.
+- (void)cloudAnchorManager:(CloudAnchorManager *)manager didUpdateFrame:(GARFrame *)garFrame {
+  for (GARAnchor *garAnchor in garFrame.updatedAnchors) {
+    if ([garAnchor isEqual:self.garAnchor] && self.resolvedAnchorNode) {
+      self.resolvedAnchorNode.simdTransform = garAnchor.transform;
+      self.resolvedAnchorNode.hidden = !garAnchor.hasValidTransform;
+    }
+  }
+}
